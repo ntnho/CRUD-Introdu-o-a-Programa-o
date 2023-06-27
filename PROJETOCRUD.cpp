@@ -35,6 +35,8 @@ struct valor
 	float variavel;
 };
 
+float fixo, variavel;
+
 void msgApresentacao();
 
 void msgValor();
@@ -52,6 +54,8 @@ void msgPagamento();
 void msgAtencao();
 
 void msgEdicao();
+
+void msgAlterarValor();
 
 void inserirDado(); 
 
@@ -109,6 +113,8 @@ void msgApresentacao()
 	printf("O PROJETO E UMA CRUD QUE CONSISTE EM UM SISTEMA PARA CONTROLE DE CLIENTES DE UM ESTACIONAMENTO.\n");
 	printf("NESSE APLICATIVO VOCÊ PODE INCLUIR UM CLIENTE, LISTAR TODOS OS CLIENTES, FILTRAR POR NOME OU \nPLACA DO VEÍCULO, EXCLUIR TODO O REGISTRO E VER O TOTAL A SER PAGO POR CADA CLIENTE. \n");
 	printf("NESSE PROGRAMA O VALOR DO ESTACIONAMENTO É DADO POR UM VALOR FIXO + UM VALOR QUE VARIA DE ACORDO \nCOM A QUANTIDADE DE HORAS EM QUE O CLIENTE PERMANECEU NO ESTACIONAMENTO.\n");
+	printf("\n\n");
+	printf("EM CASO DE PRIMEIRO ACESSO IR DIRETAMENTE PARA A OPCAO 7 DO MENU PARA DEFINIR OS VALORES DO ESTACIONAMENTO\n");
 	printf("--------------------------------------------------------------------------\n\n");
 }
 
@@ -206,6 +212,21 @@ void msgEdicao()
 	printf("                    TELA DE EDIÇÃO DE REGISTRO\n");
 	
 	printf("--------------------------------------------------------------------------\n\n");
+}
+
+void msgAlterarValor()
+{
+	system("cls");
+	
+	printf("--------------------------------------------------------------------------\n");
+	
+	printf("                    ALTERAR VALOR DO ESTACIONAMENTO\n");
+	printf("                        F[x, y, z] = x + y*z\n");
+	printf("            x = Valor fixo\n");
+	printf("            y = Valor variavel\n");
+	printf("            z = Tempo total de uso do estabelecimento (calculado automaticamente)\n");
+	printf("--------------------------------------------------------------------------\n\n");
+	
 }
 
 int menu()
@@ -489,26 +510,54 @@ void buscarNome()
 
 void valorEstacionamento()
 {
-		VALOR pagar;
 		
 		msgValor();
 		
+		int op;
+		
 		printf("O valor do estacionamento e calculado a partir da funcao f[x,y,z] = x + y*z, onde \nx = valor fixo, \ny = valor de acrescimo que e multiplicado pelo tempo de horas utilizadas,\nz = tempo total de uso do estacionamento (em horas (calculado automaticamente)).\n\n");
-	
-		printf("Digite o valor fixo: \n");
+		printf("\n\n");
+		printf("Pressione qualquer tecla para prosseguir");
+		getch();
+
 		
-		scanf("%f", &pagar.fixo);
+		do
+		{
+			msgAlterarValor();
+			
+			printf("Escolha o valor que deseja alterar. \n");
+			printf("1. Alterar o valor fixo.\n");
+			printf("2. Alterar o valor variavel. \n");
+			printf("0. Sair\n\n");
+			
+			printf("Escolha uma opcao:\n");
+			
+			scanf("%d", &op);
+			
+			switch(op)
+			{
+				case 1:
+					printf("Digite o valor fixo: \n");
+					scanf("%f", &fixo);
+					break;
+				case 2:
+					printf("Digite o valor variavel: \n");
+					scanf("%f", &variavel);
+					break;
+				default:
+					printf("Opcao invalida.\n\n");
+					break;
+			}
+			
+		}while(op != 0);
 		
-		printf("Digite o valor variavel: \n");
-		
-		scanf("%f", &pagar.variavel);
-	
 }
 
 void pagamento(int horai, int minutoi, int horaf, int minutof) {
     
 	CONTATO ctt;
-    int tempoTotal, difhoras, totFinal, total, totInicial;
+    int tempoTotal, difhoras, totFinal, totInicial;
+    float total;
     
     totInicial = ((horai*60) + minutoi);
 	totFinal = ((horaf*60) + minutof);
@@ -522,9 +571,9 @@ void pagamento(int horai, int minutoi, int horaf, int minutof) {
 
 	tempoTotal = difhoras/60;
 
-    total = 5 + (7*tempoTotal);
+    total = fixo + (variavel*tempoTotal);
 
-    printf("\nTotal a pagar R$ = %d\n", total);
+    printf("\nTotal a pagar R$ = %.2f\n", total);
 }
 
 void excluir() {
