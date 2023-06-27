@@ -403,8 +403,11 @@ void inserirDado()
 			gets(ctt.modelo);
 			
 			fflush(stdin);
-			printf("HORÁRIO DE ENTRADA: (H / M)\n");
-			scanf("%d %d", &ctt.tempo.hora, &ctt.tempo.minuto);
+			printf("HORÁRIO DE ENTRADA: (24H)\n");
+			printf("HORA:\n");
+			scanf("%d", &ctt.tempo.hora);
+			printf("MINUTOS:\n");
+			scanf("%d", &ctt.tempo.minuto);
 			
 			fwrite(&ctt, sizeof(CONTATO), 1, arqv);
 			
@@ -615,9 +618,11 @@ void excluir() {
                 printf("MODELO: %s\n", ctt.modelo);
                 printf("HORÁRIO DE ENTRADA: %d:%d\n", ctt.tempo.hora, ctt.tempo.minuto);
                 printf("\n");
-                printf("DIGITE O HORÁRIO DE SAÍDA: \n");
-
-                scanf("%d %d", &hf, &mf);
+                printf("DIGITE O HORÁRIO DE SAÍDA: (24H)\n");
+				printf("HORA\n");
+                scanf("%d", &hf);
+                printf("MINUTO\n");
+                scanf("%d", &mf);
 
                 pagamento(ctt.tempo.hora, ctt.tempo.minuto, hf, mf);
 				printf("\n");
