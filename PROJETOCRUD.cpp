@@ -27,7 +27,17 @@ struct contato
 	
 };
 
+typedef struct valor VALOR;
+
+struct valor
+{
+	float fixo;
+	float variavel;
+};
+
 void msgApresentacao();
+
+void msgValor();
 
 void msgInicial();
 
@@ -53,7 +63,9 @@ void excluir();
 
 void editar();
 
-void pagamento(int h, int m);
+void valorEstacionamento();
+
+void pagamento(int horai, int minutoi, int horaf, int minutof);
 
 void validacao();
 
@@ -96,6 +108,17 @@ void msgApresentacao()
 	printf("BEM-VINDO, PROJETO DESENVOLVIDO NA DISCIPLINA INTRODUÇÃO A PROGRAMAÇÃO.\n");
 	printf("O PROJETO E UMA CRUD QUE CONSISTE EM UM SISTEMA PARA CONTROLE DE CLIENTES DE UM ESTACIONAMENTO.\n");
 	printf("NESSE APLICATIVO VOCÊ PODE INCLUIR UM CLIENTE, LISTAR TODOS OS CLIENTES, FILTRAR POR NOME OU \nPLACA DO VEÍCULO, EXCLUIR TODO O REGISTRO E VER O TOTAL A SER PAGO POR CADA CLIENTE. \n");
+	printf("NESSE PROGRAMA O VALOR DO ESTACIONAMENTO É DADO POR UM VALOR FIXO + UM VALOR QUE VARIA DE ACORDO \nCOM A QUANTIDADE DE HORAS EM QUE O CLIENTE PERMANECEU NO ESTACIONAMENTO.\n");
+	printf("--------------------------------------------------------------------------\n\n");
+}
+
+void msgValor()
+{
+	system("cls");
+	
+	printf("--------------------------------------------------------------------------\n");
+	
+	printf("      INSERCAO DOS VALORES DO ESTACIONAMENTO\n");
 	
 	printf("--------------------------------------------------------------------------\n\n");
 }
@@ -199,6 +222,7 @@ int menu()
 		printf("\n4. Listar todos os clientes.\n");
 		printf("\n5. Pagamentos.\n");
 		printf("\n6. Reiniciar arquivo.\n");
+		printf("\n7. Definir valores para o estacionamento.\n");
 		printf("\n0. Sair.\n\n");
 		
 		printf("Escolha uma das opções: \n\n");
@@ -240,6 +264,12 @@ int menu()
 			case 6:
 				
 				exclusaoTotal();
+				
+				break;
+				
+			case 7:
+				
+				valorEstacionamento();
 				
 				break;
 				
@@ -457,8 +487,27 @@ void buscarNome()
     getch();
 }
 
+void valorEstacionamento()
+{
+		VALOR pagar;
+		
+		msgValor();
+		
+		printf("O valor do estacionamento e calculado a partir da funcao f[x,y,z] = x + y*z, onde \nx = valor fixo, \ny = valor de acrescimo que e multiplicado pelo tempo de horas utilizadas,\nz = tempo total de uso do estacionamento (em horas (calculado automaticamente)).\n\n");
+	
+		printf("Digite o valor fixo: \n");
+		
+		scanf("%f", &pagar.fixo);
+		
+		printf("Digite o valor variavel: \n");
+		
+		scanf("%f", &pagar.variavel);
+	
+}
+
 void pagamento(int horai, int minutoi, int horaf, int minutof) {
-    CONTATO ctt;
+    
+	CONTATO ctt;
     int tempoTotal, difhoras, totFinal, total, totInicial;
     
     totInicial = ((horai*60) + minutoi);
@@ -473,7 +522,7 @@ void pagamento(int horai, int minutoi, int horaf, int minutof) {
 
 	tempoTotal = difhoras/60;
 
-    total = 5 + (2 * tempoTotal); 
+    total = 5 + (7*tempoTotal);
 
     printf("\nTotal a pagar R$ = %d\n", total);
 }
@@ -720,4 +769,6 @@ void exclusaoTotal() {
     printf("----------------------------------------------------\n");
     getch();
 }
+
+
 
