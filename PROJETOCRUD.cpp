@@ -27,19 +27,15 @@ struct contato
 	
 };
 
-typedef struct valor VALOR;
-
-struct valor
-{
-	float fixo;
-	float variavel;
-};
+float caixa;
 
 float fixo, variavel;
 
 void msgApresentacao();
 
 void msgValor();
+
+void msgCaixa();
 
 void msgInicial();
 
@@ -74,6 +70,8 @@ void pagamento(int horai, int minutoi, int horaf, int minutof);
 void validacao();
 
 void exclusaoTotal();
+
+float totalCaixa(int horai, int minutoi, int horaf, int minutof); 
 
 int menu();
 
@@ -116,6 +114,19 @@ void msgApresentacao()
 	printf("\n\n");
 	printf("EM CASO DE PRIMEIRO ACESSO IR DIRETAMENTE PARA A OPCAO 7 DO MENU PARA DEFINIR OS VALORES DO ESTACIONAMENTO\n");
 	printf("--------------------------------------------------------------------------\n\n");
+}
+
+void msgCaixa()
+{
+	system("cls");
+	
+	printf("--------------------------------------------------------------------------\n");
+	
+	printf("            VALOR TOTAL EM CAIXA R$ = %.2f\n", caixa);
+	
+	printf("--------------------------------------------------------------------------\n\n");
+	
+	getch();
 }
 
 void msgValor()
@@ -203,6 +214,8 @@ void msgPagamento()
 	printf("--------------------------------------------------------------------------\n\n");
 }
 
+
+
 void msgEdicao()
 {
 	system("cls");
@@ -244,6 +257,7 @@ int menu()
 		printf("\n5. Pagamentos.\n");
 		printf("\n6. Reiniciar arquivo.\n");
 		printf("\n7. Definir valores para o estacionamento.\n");
+		printf("\n8. Mostrar na tela o valor total em caixa.\n");
 		printf("\n0. Sair.\n\n");
 		
 		printf("Escolha uma das opções: \n\n");
@@ -291,6 +305,12 @@ int menu()
 			case 7:
 				
 				valorEstacionamento();
+				
+				break;
+				
+			case 8:
+				
+				msgCaixa();
 				
 				break;
 				
@@ -577,6 +597,30 @@ void pagamento(int horai, int minutoi, int horaf, int minutof) {
     total = fixo + (variavel*tempoTotal);
 
     printf("\nTotal a pagar R$ = %.2f\n", total);
+    
+}
+
+float totalCaixa(int horai, int minutoi, int horaf, int minutof) 
+{
+    
+	CONTATO ctt;
+    int tempoTotal, difhoras, totFinal, totInicial;
+    float total;
+    
+    totInicial = ((horai*60) + minutoi);
+	totFinal = ((horaf*60) + minutof);
+	
+	difhoras = totFinal - totInicial;
+    
+    if (difhoras < 0)
+    {
+    	difhoras = (1440 - totInicial) + totFinal;
+	}
+
+	tempoTotal = difhoras/60;
+
+    total = fixo + (variavel*tempoTotal);
+	
 }
 
 void excluir() {
@@ -600,6 +644,7 @@ void excluir() {
         printf("\nProblemas com a abertura do arquivo.\n");
     } else 
 	{
+		
         fflush(stdin);
         printf("Digite a placa do veículo: \n");
         fgets(placa, sizeof(placa), stdin);
@@ -633,7 +678,7 @@ void excluir() {
 
                 if (pgt == 1) 
 				{
-				   
+					caixa += totalCaixa(ctt.tempo.hora, ctt.tempo.minuto, hf, mf);
 					printf("\nPagamento efetuado com sucesso!\n");
                     
                 } 
@@ -693,6 +738,8 @@ void editar()
     		printf("--------------------------\n\n");
     		i++;	
 		}
+		if(i>1)
+		{
     		do{
 				printf("Que contato deseja alterar? (Digite o índice)\n");
 	    		
@@ -768,7 +815,12 @@ void editar()
 				}
 				while(op != 0);
 			}
-			
+		}
+		else
+		{
+			printf("Sem clientes para editar.\n");
+			getch();	
+		}
     		fclose(arqv);
 		
     }
