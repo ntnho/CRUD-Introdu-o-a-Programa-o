@@ -4,22 +4,14 @@
 #include <locale.h>
 #include <string.h>
 
-typedef struct valores VALORES;
-
-struct valores
-{
-	float fixo;
-	float acrescimo;
-	float caixa;
-};
-
-
 typedef struct horario HORARIO;
 
 struct horario
 {
 	int hora;
 	int minuto;
+	int horaf;
+	int minutof;
 };
 
 typedef struct contato CONTATO;
@@ -37,11 +29,8 @@ struct contato
 	
 };
 
-float caixa1;
 
-float fixo1, variavel;
-
-void msgtotalCaixa();
+int totcaixa;
 
 void msgApresentacao();
 
@@ -57,17 +46,19 @@ void msgSaida();
 
 void msgListar();
 
+void msgRegistro();
+
 void msgPagamento();
 
 void msgAtencao();
 
 void msgEdicao();
 
-void msgAlterarValor();
-
 void inserirDado(); 
 
 void listar();
+
+void registro();
 
 void buscarNome();
 
@@ -75,15 +66,13 @@ void excluir();
 
 void editar();
 
-void valorEstacionamento();
-
 void pagamento(int horai, int minutoi, int horaf, int minutof);
 
 void validacao();
 
 void exclusaoTotal();
 
-float totalCaixa(int horai, int minutoi, int horaf, int minutof); 
+int totalCaixa(int horai, int minutoi, int horaf, int minutof); 
 
 int menu();
 
@@ -113,7 +102,7 @@ int main(){
 return 0;
 }
 
-	
+
 
 int menu()
 {
@@ -126,10 +115,10 @@ int menu()
 		printf("\n1. Adicionar cliente.\n");
 		printf("\n2. Editar cliente.\n");
 		printf("\n3. Buscar cliente pelo nome ou placa.\n");
-		printf("\n4. Listar todos os clientes.\n");
+		printf("\n4. Listar todos os clientes ativos.\n");
 		printf("\n5. Pagamentos.\n");
 		printf("\n6. Reiniciar arquivo.\n");
-		printf("\n7. Definir valores para o estacionamento.\n");
+		printf("\n7. Listar todos os clientes do dia.\n");
 		printf("\n8. Mostrar na tela o valor total em caixa.\n");
 		printf("\n0. Sair.\n\n");
 		
@@ -177,15 +166,16 @@ int menu()
 				
 			case 7:
 				
-				valorEstacionamento();
+				registro();
 				
 				break;
 				
 			case 8:
 				
-				msgtotalCaixa();
+				msgCaixa();
 				
 				break;
+				
 				
 			case 0:
 				
@@ -216,7 +206,7 @@ int validacao(const char* testePlaca)
 	if(arqv == NULL)
 	{
 		printf("Problemas com abertura do arquivo!\n");
-		getch();
+		return 0;
 	}
 	else
 	{
@@ -240,19 +230,18 @@ int validacao(const char* testePlaca)
 void inserirDado()
 {
 	FILE* arqv;
-	FILE* arqvregistro;
+
 		
 	CONTATO ctt;
 	
 	arqv = fopen("clientes.txt", "ab");
-	arqvregistro = fopen("registro.txt", "w");
+
 	
 	int op;
 	
-	if (arqv == NULL || arqvregistro == NULL)
+	if ((arqv == NULL))
 	{
 		printf("Problemas com abertura do arquivo!\n");
-		getch();
 	}
 	else
 	{
@@ -306,63 +295,20 @@ void inserirDado()
 			scanf("%d", &ctt.tempo.minuto);
 			
 			fwrite(&ctt, sizeof(CONTATO), 1, arqv);
-			fwrite(&ctt, sizeof(CONTATO), 1, arqvregistro);
+
 			
 			printf("Deseja adicionar outro cliente? (1- Sim / 0- Não)\n\n");
 			
 			scanf("%d", &op);
 			
+			
 		}while(op == 1);
 		
 		
 		fclose(arqv);
-		fclose(arqvregistro);
 	}
 }
 
-void msgtotalCaixa()
-{
-	FILE* arqvregistro;
-	
-	VALORES valor;
-	
-	arqvregistro = fopen("registro.txt", "r");
-	
-	if (arqvregistro == NULL)
-	{
-		printf("Problemas com abertura do arquivo!\n");
-		getch();
-	}
-	else
-	{
-		if(fread(&valor, sizeof(VALORES), 1, arqvregistro) == 1)
-		{
-			system("cls");
-	
-			printf("--------------------------------------------------------------------------\n");
-			
-			printf("            VALOR TOTAL EM CAIXA R$ = %.2f\n", valor.caixa);
-			
-			printf("--------------------------------------------------------------------------\n\n");
-			
-			getch();
-		}
-		else
-		{
-			system("cls");
-	
-			printf("--------------------------------------------------------------------------\n");
-			
-			printf("            VALOR TOTAL EM CAIXA R$ = 0\n");
-			
-			printf("--------------------------------------------------------------------------\n\n");
-			
-			getch();
-		}
-	
-	}
-	fclose(arqvregistro);
-}
 
 void listar()
 {
@@ -378,7 +324,6 @@ void listar()
 	if (arqv == NULL)
 	{
 		printf("Problemas com abertura do arquivo!\n");
-		getch();
 	}
 	else
 	{
@@ -402,6 +347,43 @@ void listar()
 	getch();
 }
 
+void registro()
+{
+	FILE* arqv2;
+	
+	CONTATO ctt;
+	
+	arqv2 = fopen("registro.txt", "r");
+	
+	msgRegistro();
+	
+	if (arqv2 == NULL)
+	{
+		printf("Problemas com abertura do arquivo!\n");
+	}
+	else
+	{
+		while(fread(&ctt, sizeof(CONTATO), 1, arqv2) == 1)
+		{			
+			
+			printf("NOME: %s\n", ctt.nome);
+			printf("SOBRENOME: %s\n", ctt.sobrenome);
+			printf("FONE: %s\n", ctt.fone);
+			printf("PLACA: %s\n", ctt.placa);
+			printf("MARCA: %s\n", ctt.marca);
+			printf("MODELO: %s\n", ctt.modelo);
+			printf("HORÁRIO DE ENTRADA: %d:%d\n", ctt.tempo.hora, ctt.tempo.minuto);
+			printf("HORARIO DE SAIDA: %d:%d\n", ctt.tempo.horaf, ctt.tempo.minutof);
+			
+			printf("---------------------------------------------------------------------\n\n");
+		}
+	}
+	
+	fclose(arqv2);
+	
+	getch();
+}
+
 void buscarNome()
 {
     FILE* arqv;
@@ -416,7 +398,6 @@ void buscarNome()
     if (arqv == NULL)
     {
         printf("Problemas com a abertura do arquivo!\n");
-        getch();
     }
     else
     {
@@ -453,77 +434,8 @@ void buscarNome()
     getch();
 }
 
-void valorEstacionamento()
-{
-		FILE* arqv;
-		FILE* arqvregistro;
-		
-		VALORES valor;
-		
-		arqv = fopen("clientes.txt", "ab");
-		arqvregistro = fopen("registro.txt", "w");
-				
-		if(arqv == NULL)
-		{
-			printf("Problemas para iniciar o arquivo!\n");
-			getch();
-		}
-		else
-		{
 
-			msgValor();
-			
-			int op;
-			
-			printf("O valor do estacionamento e calculado a partir da funcao f[x,y,z] = x + y*z, onde \nx = valor fixo, \ny = valor de acrescimo que e multiplicado pelo tempo de horas utilizadas,\nz = tempo total de uso do estacionamento (em horas (calculado automaticamente)).\n\n");
-			printf("\n\n");
-			printf("Pressione qualquer tecla para prosseguir");
-			getch();
-	
-			
-			do
-			{
-				msgAlterarValor();
-				
-				printf("Escolha o valor que deseja alterar. \n");
-				printf("1. Alterar o valor fixo.\n");
-				printf("2. Alterar o valor variavel. \n");
-				printf("0. Sair\n\n");
-				
-				printf("Escolha uma opcao:\n");
-				
-				scanf("%d", &op);
-				
-				switch(op)
-				{
-					case 1:
-						printf("Digite o valor fixo: \n");
-						scanf("%f", &fixo1);
-						valor.fixo = fixo1;
-						fwrite(&valor, sizeof(VALORES), 1, arqv);
-						fwrite(&valor, sizeof(VALORES), 1, arqvregistro);
-						break;
-					case 2:
-						printf("Digite o valor variavel: \n");
-						scanf("%f", &variavel);
-						valor.acrescimo = variavel;
-						fwrite(&valor, sizeof(VALORES), 1, arqv);
-						fwrite(&valor, sizeof(VALORES), 1, arqvregistro);
-						break;
-					default:
-						printf("Opcao invalida.\n\n");
-						break;
-				}
-				
-			}while(op != 0);
-		}
-		
-		fclose(arqv);
-		fclose(arqvregistro);
-}
-
-void pagamento(int horai, int minutoi, int horaf, int minutof) 
-{
+void pagamento(int horai, int minutoi, int horaf, int minutof) {
     
 	CONTATO ctt;
     int tempoTotal, difhoras, totFinal, totInicial;
@@ -541,13 +453,13 @@ void pagamento(int horai, int minutoi, int horaf, int minutof)
 
 	tempoTotal = difhoras/60;
 
-    total = fixo1 + (variavel*tempoTotal);
+    total = 5 + (2*tempoTotal);
 
     printf("\nTotal a pagar R$ = %.2f\n", total);
     
 }
 
-float totalCaixa(int horai, int minutoi, int horaf, int minutof) 
+int totalCaixa(int horai, int minutoi, int horaf, int minutof) 
 {
     
 	CONTATO ctt;
@@ -566,16 +478,17 @@ float totalCaixa(int horai, int minutoi, int horaf, int minutof)
 
 	tempoTotal = difhoras/60;
 
-    total = fixo1 + (variavel*tempoTotal);
+    total = 5 + (2*tempoTotal);
+    
+    return total;
 	
 }
 
 void excluir() {
     FILE* arqvorigem;
     FILE* arqvtemp;
-	FILE* arqvregistro;
-	
-	VALORES valor;
+    FILE* arqv2;
+
     CONTATO ctt;
 	
 	int encontrado = 0;
@@ -583,19 +496,17 @@ void excluir() {
     int hf, mf, pgt;
 
     arqvorigem = fopen("clientes.txt", "rb");
-    
-	arqvregistro = fopen("registro.txt", "w");
-	
+
     arqvtemp = fopen("clientestemp.txt", "ab");
+    
+    arqv2 = fopen("registro.txt", "ab");
     
     msgPagamento();
 
-    if ((arqvorigem == NULL) || (arqvtemp == NULL)) 
+    if ((arqvorigem == NULL) || (arqvtemp == NULL) || (arqv2 == NULL)) 
 	{
         printf("\nProblemas com a abertura do arquivo.\n");
-        getch();
-    } 
-	else 
+    } else 
 	{
 		
         fflush(stdin);
@@ -618,11 +529,11 @@ void excluir() {
                 printf("\n");
                 printf("DIGITE O HORÁRIO DE SAÍDA: (24H)\n");
 				printf("HORA\n");
-                scanf("%d", &hf);
+                scanf("%d", &ctt.tempo.horaf);
                 printf("MINUTO\n");
-                scanf("%d", &mf);
+                scanf("%d", &ctt.tempo.minutof);
 
-                pagamento(ctt.tempo.hora, ctt.tempo.minuto, hf, mf);
+                pagamento(ctt.tempo.hora, ctt.tempo.minuto, ctt.tempo.horaf, ctt.tempo.minutof);
 				printf("\n");
                 printf("O valor foi pago? (1- Sim / 0- Não)\n");
                 scanf("%d", &pgt);
@@ -631,17 +542,16 @@ void excluir() {
 
                 if (pgt == 1) 
 				{
-					caixa1 += totalCaixa(ctt.tempo.hora, ctt.tempo.minuto, hf, mf);
-					valor.caixa = caixa1;
-					fwrite(&valor, sizeof(VALORES), 1, arqvregistro);
-					fwrite(&valor, sizeof(VALORES), 1, arqvorigem);
+					totcaixa += totalCaixa(ctt.tempo.hora, ctt.tempo.minuto, ctt.tempo.horaf, ctt.tempo.minutof);
 					printf("\nPagamento efetuado com sucesso!\n");
+					fwrite(&ctt, sizeof(CONTATO), 1, arqv2);
                     
                 } 
 				else 
 				{
 					printf("Pagamento não efetuado.\n");
                     fwrite(&ctt, sizeof(CONTATO), 1, arqvtemp);
+                    
                 }
             } 
 			else 
@@ -659,7 +569,7 @@ void excluir() {
 
     fclose(arqvorigem);
     fclose(arqvtemp);
-    fclose(arqvregistro);
+	fclose(arqv2);
 
     remove("clientes.txt");
     rename("clientestemp.txt", "clientes.txt");
@@ -683,7 +593,6 @@ void editar()
 	if (arqv == NULL)
     {
         printf("Problemas com a abertura do arquivo!\n");
-        getch();
     }
     else
     {
@@ -699,7 +608,7 @@ void editar()
 		if(i>1)
 		{
     		do{
-				printf("Que contato deseja alterar? (Digite o índice)\n");
+				printf("Que contato deseja alterar? (Digite o valor do índice ou 0 para sair)\n");
 	    		
 	    		scanf("%d", &indice);
 	    		fflush(stdin);
@@ -740,6 +649,11 @@ void editar()
 						
 						fseek(arqv, indice * sizeof(CONTATO), SEEK_SET);
 						fwrite(&ctt, sizeof(CONTATO), 1, arqv);
+						
+						printf("Opção alterada com sucesso!\n");
+						getch();
+						printf("\n\n");
+						
 					}
 					else if(op == 2)
 					{
@@ -750,6 +664,11 @@ void editar()
 						
 						fseek(arqv, indice * sizeof(CONTATO), SEEK_SET);
 						fwrite(&ctt, sizeof(CONTATO), 1, arqv);
+						
+						printf("Opção alterada com sucesso!\n");
+						getch();
+						printf("\n\n");
+						
 					}
 					else if(op == 3)
 					{
@@ -760,6 +679,12 @@ void editar()
 						
 						fseek(arqv, indice * sizeof(CONTATO), SEEK_SET);
 						fwrite(&ctt, sizeof(CONTATO), 1, arqv);
+						
+						printf("Opção alterada com sucesso!\n");
+						getch();
+						printf("\n\n");
+						
+						
 					}
 					else if(op == 0)
 					{
@@ -767,7 +692,7 @@ void editar()
 					}
 					else
 					{
-						printf("Digite uma opção válida.\n");
+						printf("Digite uma opção válida.\n\n");
 					}
 					
 				}
@@ -790,23 +715,23 @@ void editar()
 void exclusaoTotal() {
     FILE* arqv;
     FILE* arqvtemp;
-    FILE* arqvregistro;
+    FILE* arqv2;
+    FILE* arqv2temp;
     
     CONTATO ctt;
-	VALORES valor;
-	
+
     arqv = fopen("clientes.txt", "rb");
     arqvtemp = fopen("clientestemp.txt", "ab");
-	arqvregistro = fopen("registro.txt", "rb");
+    arqv2 = fopen("registro.txt", "r");
+    arqv2temp = fopen("registrotemp.txt", "a");
 	
     int op;
 	
 	msgAtencao();
 	
-    if ((arqv == NULL) || (arqvtemp == NULL) || (arqvregistro == NULL)) 
+    if ((arqv == NULL) || (arqvtemp == NULL) || (arqv2 == NULL) || (arqv2temp == NULL)) 
 	{
         printf("\nProblemas com a abertura do arquivo.\n");
-        getch();
     } 
 	else 
 	{
@@ -818,30 +743,32 @@ void exclusaoTotal() {
             while (fread(&ctt, sizeof(CONTATO), 1, arqv) == 1) 
 			{
             }
-            while (fread(&ctt, sizeof(CONTATO), 1, arqvregistro) == 1) 
-            {
-			}
-			while (fread(&valor, sizeof(VALORES), 1, arqvregistro) == 1)
+            while (fread(&ctt, sizeof(CONTATO), 1, arqv2) == 1) 
 			{
-			}
+            }
         } 
 		else 
 		{
             fclose(arqv);
             fclose(arqvtemp);
-            fclose(arqvregistro);
+            fclose(arqv2);
+            fclose(arqv2temp);
+            
             return;
         }
     }
 
     fclose(arqv);
     fclose(arqvtemp);
-    fclose(arqvregistro);
-
+    fclose(arqv2);
+	fclose(arqv2temp);
+	
     remove("clientes.txt");
-    remove("registro.txt");
     rename("clientestemp.txt", "clientes.txt");
-
+	remove("registro.txt");
+	rename("registrotemp.txt", "registro.txt");
+	
+	
     printf("----------------------------------------------------\n");
     printf("         Clientes excluídos com sucesso!\n");
     printf("----------------------------------------------------\n");
@@ -849,6 +776,24 @@ void exclusaoTotal() {
 }
 
 
+void msgCaixa()
+{
+	FILE* arqv2;
+
+	arqv2 = fopen("registro.txt", "rb");
+	
+	system("cls");
+	
+	printf("--------------------------------------------------------------------------\n");
+	
+	printf("            VALOR TOTAL EM CAIXA R$ = %d\n", totcaixa);
+	
+	printf("--------------------------------------------------------------------------\n\n");
+	
+	fclose(arqv2);
+	
+	getch();
+}
 
 void msgApresentacao()
 {
@@ -859,35 +804,13 @@ void msgApresentacao()
 	printf("BEM-VINDO, PROJETO DESENVOLVIDO NA DISCIPLINA INTRODUÇÃO A PROGRAMAÇÃO.\n");
 	printf("O PROJETO E UMA CRUD QUE CONSISTE EM UM SISTEMA PARA CONTROLE DE CLIENTES DE UM ESTACIONAMENTO.\n");
 	printf("NESSE APLICATIVO VOCÊ PODE INCLUIR UM CLIENTE, LISTAR TODOS OS CLIENTES, FILTRAR POR NOME OU \nPLACA DO VEÍCULO, EXCLUIR TODO O REGISTRO E VER O TOTAL A SER PAGO POR CADA CLIENTE. \n");
-	printf("NESSE PROGRAMA O VALOR DO ESTACIONAMENTO É DADO POR UM VALOR FIXO + UM VALOR QUE VARIA DE ACORDO \nCOM A QUANTIDADE DE HORAS EM QUE O CLIENTE PERMANECEU NO ESTACIONAMENTO.\n");
+	printf("NESSE PROGRAMA O VALOR DO ESTACIONAMENTO É DADO POR UM VALOR FIXO + UM VALOR QUE VARIA DE ACORDO \nCOM A QUANTIDADE DE HORAS EM QUE O CLIENTE PERMANECEU NO ESTACIONAMENTO TAL COMO UM ESTACIONAMENTO DE SHOPPING.\n");
+	printf("O VALOR DO ESTACIONAMENTO É FIXO EM R$5 EM ATÉ 1 HORA DE USO MAIS R$2 PARA CADA HORA ADICIONAL");
 	printf("\n\n");
-	printf("EM CASO DE PRIMEIRO ACESSO IR DIRETAMENTE PARA A OPCAO 7 DO MENU PARA DEFINIR OS VALORES DO ESTACIONAMENTO\n");
 	printf("--------------------------------------------------------------------------\n\n");
 }
 
-void msgCaixa()
-{
-	system("cls");
-	
-	printf("--------------------------------------------------------------------------\n");
-	
-	printf("            VALOR TOTAL EM CAIXA R$ = %.2f\n", caixa1);
-	
-	printf("--------------------------------------------------------------------------\n\n");
-	
-	getch();
-}
 
-void msgValor()
-{
-	system("cls");
-	
-	printf("--------------------------------------------------------------------------\n");
-	
-	printf("      INSERCAO DOS VALORES DO ESTACIONAMENTO\n");
-	
-	printf("--------------------------------------------------------------------------\n\n");
-}
 
 void msgInicial()
 {
@@ -941,6 +864,19 @@ void msgListar()
 	
 }
 
+void msgRegistro()
+{
+	
+	system("cls");
+	
+	printf("--------------------------------------------------------------------------\n");
+	
+	printf("                REGISTRO DE TODOS OS CLIENTES\n");
+	
+	printf("--------------------------------------------------------------------------\n\n");
+	
+}
+
 void msgAtencao()
 {
 	system("cls");
@@ -973,19 +909,5 @@ void msgEdicao()
 	
 	printf("                    TELA DE EDIÇÃO DE REGISTRO\n");
 	
-	printf("--------------------------------------------------------------------------\n\n");
-}
-
-void msgAlterarValor()
-{
-	system("cls");
-	
-	printf("--------------------------------------------------------------------------\n");
-	
-	printf("                    ALTERAR VALOR DO ESTACIONAMENTO\n");
-	printf("                        F[x, y, z] = x + y*z\n");
-	printf("            x = Valor fixo\n");
-	printf("            y = Valor variavel\n");
-	printf("            z = Tempo total de uso do estabelecimento (calculado automaticamente)\n");
 	printf("--------------------------------------------------------------------------\n\n");
 }
